@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Celestial Bodies</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+      svg {
+        background-color: #222222;
+        height: 800px;
+        width: 800px;
+      }
+      circle {
+        fill: #ffffff;
+        stroke: #aaaaaa;
+        stroke-width: 1;
+      }
+      text {
+        fill: #ffffff;
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        text-anchor: middle;
+      }
+      .earth {
+        fill: #0000ff;
+      }
+      .mercury {
+        fill: #ff0000;
+      }
+      .venus {
+        fill: #ff9900;
+      }
+      .mars {
+        fill: #ff3300;
+      }
+      .jupiter {
+        fill: #ffd700;
+      }
+      .saturn {
+        fill: #c0c0c0;
+      }
+      .uranus {
+        fill: #00ffff;
+      }
+      .neptune {
+        fill: #000080;
+      }
+      /* Add more sign classes and colors as needed */
+    </style>
+  </head>
+  <body>
+    <svg id="celestial-bodies"></svg>
+  </body>
+  <script>
+    function fetchPlanetData() {
+      fetch("http://127.0.0.1:5000/api/planets")
+        .then((res) => res.json())
+        .then((data) => handlePlanets(data));
+    }
+
+    function handlePlanets(planets) {
+      console.log(planets);
+
+      const svg = d3.select("#celestial-bodies");
+      const width = 500;
+      const height = 500;
+      const radius = 200;
+
+      // Remove existing planet circles and names
+      svg.selectAll(".planet-circle").remove();
+      svg.selectAll(".planet-name").remove();
+
+      // Draw Earth
+      svg
+        .append("circle")
+        .attr("class", "earth")
+        .attr("cx", width / 2)
+        .attr("cy", height / 2)
+        .attr("r", radius);
+
+      // Draw planets
+      planets.forEach((planet) => {
+        const x = width / 2 + radius * Math.cos(planet.right_ascension);
+        const y = height / 2 + radius * Math.sin(planet.declination);
+
+        // Draw planet circle
+        svg
+          .append("circle")
+          .attr("class", `planet-circle ${planet.name.toLowerCase()}`)
+          .attr("cx", x)
+          .attr("cy", y)
+          .attr("r", 10); // Adjust the size of the planet circles as needed
+
+        // Draw planet name
+        svg
+          .append("text")
+          .attr("class", "planet-name")
+          .attr("x", x)
+          .attr("y", y - 15) // Adjust the positioning of the text as needed
+          .text(planet.name);
+
+        // Draw astrological sign
+        const sign = planet.constellation[1].toLowerCase();
+        svg
+          .append("text")
+          .attr("class", "astrological-sign")
+          .attr("x", x)
+          .attr("y", y + 15) // Adjust the positioning of the text as needed
+          .text(sign);
+      });
+    }
+
+    // Fetch planet data every second
+    setInterval(fetchPlanetData, 1000);
+  </script>
+</html>
