@@ -53,7 +53,7 @@
   </body>
   <script>
     function fetchPlanetData() {
-      fetch("http://127.0.0.1:5000/api/planets")
+      fetch(`${window.location}/api/planets`)
         .then((res) => res.json())
         .then((data) => handlePlanets(data));
     }
