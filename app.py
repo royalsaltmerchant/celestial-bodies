@@ -22,6 +22,8 @@ def get_planet_info():
     saturn = ephem.Saturn()
     uranus = ephem.Uranus()
     neptune = ephem.Neptune()
+    sun = ephem.Sun()
+    moon = ephem.Moon()
 
     # Compute the positions of the planets
     mercury.compute(date)
@@ -31,8 +33,10 @@ def get_planet_info():
     saturn.compute(date)
     uranus.compute(date)
     neptune.compute(date)
+    sun.compute(date)
+    moon.compute(date)
 
-    planets = [mercury, venus, mars, jupiter, saturn, uranus, neptune]
+    planets = [sun, moon, mercury, venus, mars, jupiter, saturn, uranus, neptune]
 
     # Get the constellations for each planet
     planet_info = []
