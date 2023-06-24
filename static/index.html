@@ -87,7 +87,7 @@
       // Draw planets
       planets.forEach((planet) => {
         const x = width / 2 + radius * Math.cos(planet.right_ascension);
-        const y = height / 2 + radius * Math.sin(planet.declination);
+        const y = height / 2 - radius * Math.sin(planet.declination);
 
         // Draw planet circle
         svg
