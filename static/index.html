@@ -2,13 +2,40 @@
 <html>
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Celestial Bodies</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      strong {
+        color: #f2d194;
+      }
+      body {
+        color: rgb(221, 221, 221);
+        background-color: rgb(27, 27, 27);
+      }
+      nav {
+        padding: 5px;
+        background-color: #223c57;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .container {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-wrap: wrap;
+      }
       svg {
-        background-color: #222222;
-        height: 800px;
-        width: 800px;
+        background-color: inherit;
+        height: 100%;
+        width: 100%;
       }
       circle {
         fill: #ffffff;
@@ -21,41 +48,59 @@
         font-size: 12px;
         text-anchor: middle;
       }
+      .ra {
+        color: #53b1ff;
+      }
+      .dec {
+        color: #ce58a8;
+      }
+      #planet-info {
+        width: 230px;
+        border: 1px solid white;
+        padding: 5px;
+      }
       .earth {
-        fill: #0000ff;
+        fill: #3b80b9;
       }
       .mercury {
-        fill: #ff0000;
+        fill: #c55353;
       }
       .venus {
-        fill: #ff9900;
+        fill: #e3aa00;
       }
       .mars {
-        fill: #ff3300;
+        fill: #aa2200;
       }
       .jupiter {
-        fill: #ffd700;
+        fill: #d87f04;
       }
       .saturn {
-        fill: #c4e3a1;
+        fill: #9ebc7c;
       }
       .uranus {
-        fill: #00ffff;
+        fill: #00bdbd;
       }
       .neptune {
-        fill: #3c3cd1;
+        fill: #4848c1;
       }
       .moon {
-        fill: gray
+        fill: rgb(176, 176, 176)
       }
       .sun {
-        fill: yellow
+        fill: rgb(233, 214, 0)
       }
       /* Add more sign classes and colors as needed */
     </style>
   </head>
   <body>
-    <svg id="celestial-bodies"></svg>
+    <nav>
+      <h3>Celestial Bodies</h3>
+      <div id="last-update"></div>
+    </nav>
+    <div class="container">
+      <svg id="celestial-bodies"></svg>
+      <div id="planet-info"></div>
+    </div>
   </body>
   <script>
     function fetchPlanetData() {
@@ -66,28 +111,36 @@
 
     function handlePlanets(planets) {
       console.log(planets);
+      // clear div
+      document.getElementById("celestial-bodies").innerHTML = "";
 
       const svg = d3.select("#celestial-bodies");
-      const width = 500;
-      const height = 500;
-      const radius = 200;
+      const container = document.querySelector('.container');
+      const containerWidth = container.clientWidth;
+      const containerHeight = container.clientHeight;
+      const radius = Math.min(containerWidth, containerHeight) * 0.4;
+      const centerX = containerWidth / 2;
+      const centerY = containerHeight / 2;
+      const planetInfoDiv = document.getElementById("planet-info");
+      planetInfoDiv.innerHTML = ""; // Clear previous planet info
 
       // Remove existing planet circles and names
       svg.selectAll(".planet-circle").remove();
       svg.selectAll(".planet-name").remove();
+      svg.selectAll(".planet-info-text").remove();
 
       // Draw Earth
       svg
         .append("circle")
         .attr("class", "earth")
-        .attr("cx", width / 2)
-        .attr("cy", height / 2)
+        .attr("cx", centerX)
+        .attr("cy", centerY)
         .attr("r", radius);
 
       // Draw planets
       planets.forEach((planet) => {
-        const x = width / 2 + radius * Math.cos(planet.right_ascension);
-        const y = height / 2 - radius * Math.sin(planet.declination);
+        const x = centerX + radius * Math.cos(planet.right_ascension);
+        const y = centerY - radius * Math.sin(planet.declination);
 
         // Draw planet circle
         svg
@@ -95,14 +148,14 @@
           .attr("class", `planet-circle ${planet.name.toLowerCase()}`)
           .attr("cx", x)
           .attr("cy", y)
-          .attr("r", 10); // Adjust the size of the planet circles as needed
+          .attr("r", radius * 0.05); // Adjust the size of the planet circles as needed
 
         // Draw planet name
         svg
           .append("text")
           .attr("class", "planet-name")
           .attr("x", x)
-          .attr("y", y - 15) // Adjust the positioning of the text as needed
+          .attr("y", y - radius * 0.07) // Adjust the positioning of the text as needed
           .text(planet.name);
 
         // Draw astrological sign
@@ -111,8 +164,19 @@
           .append("text")
           .attr("class", "astrological-sign")
           .attr("x", x)
-          .attr("y", y + 15) // Adjust the positioning of the text as needed
+          .attr("y", y + radius * 0.07) // Adjust the positioning of the text as needed
           .text(sign);
+
+        // Display Right Ascension and Declination
+        const infoText = document.createElement("div");
+        infoText.setAttribute("class", "planet-info-text");
+        infoText.innerHTML = `<strong>${planet.name}</strong><br /><div class="ra">RA: ${planet.right_ascension}</div><div class="dec">Dec: ${planet.declination}</div>`;
+        planetInfoDiv.appendChild(infoText);
+
+        // Update last update info
+        const luDiv = document.getElementById("last-update")
+        const now = new Date();
+        luDiv.innerText = `Last updated at: ${now.toLocaleTimeString()}`
       });
     }
 
